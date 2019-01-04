@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import login as auth_login_view, logout as auth_logout_view
+from django.contrib.auth.views import auth_login as auth_login_view, auth_logout as auth_logout_view
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render, resolve_url
 from urllib.parse import parse_qs, urlencode
@@ -83,6 +83,10 @@ def authz_cb(request):
         query = parse_qs(request.META['QUERY_STRING'])
         userinfo = client.callback(query, request.session)
         request.session["userinfo"] = userinfo
+        # id_token is no longer used in the communication here after
+        # and contains elements that are not JSON serializable, causing the
+        # app to blow up.
+        del request.session['id_token']
         user = authenticate(request=request, **userinfo)
         if user:
             login(request, user)
