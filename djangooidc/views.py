@@ -86,7 +86,7 @@ def authz_cb(request):
         # id_token is no longer used in the communication here after
         # and contains elements that are not JSON serializable, causing the
         # app to blow up.
-        del request.session['id_token']
+        # del request.session['id_token']
         user = authenticate(request=request, **userinfo)
         if user:
             login(request, user)
